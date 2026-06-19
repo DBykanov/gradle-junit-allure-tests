@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id("io.freefair.lombok") version "9.5.0"
+
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //testImplementation platform('org.junit:junit-bom:6.0.0')
+    //testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Source: https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.14.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation("org.junit-pioneer:junit-pioneer:2.3.0")
+
+    // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.22.0")
+    // Source: https://mvnrepository.com/artifact/org.aeonbits.owner/owner
+    implementation("org.aeonbits.owner:owner:1.0.12")
+    // Source: https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation("commons-io:commons-io:2.22.0")
+
+    // ПОДКЛЮЧАЕМ ТОЛЬКО ДВИЖОК СБОРА ДАННЫХ ALLURE
+    testImplementation 'io.qameta.allure:allure-junit5:2.13.6'
+}
+
+test {
+    useJUnitPlatform {
+        // Проверяем, передан ли системный параметр customTags
+        def tagsProperty = System.getProperty("customTags")
+        if (tagsProperty != null && !tagsProperty.isEmpty()) {
+            // Разделяем теги по запятой и добавляем в фильтр
+            tagsProperty.split(",").each { tag ->
+                includeTags tag.trim()
+            }
+        }
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+clean {
+    delete 'allure-results'
+}
